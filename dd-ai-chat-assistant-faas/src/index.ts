@@ -10,11 +10,11 @@ import { v4 as uuidv4 } from 'uuid';
 const AI_SERVICE_URL1 = 'https://base-api.aimaxhug.com/api/v1/chat'; // 生产环境
 
 fieldDecoratorKit.setDecorator({
-    name: 'AI 生图多模型（AimaxHug）',
+    name: 'AI 生文多模型（AimaxHug）',
     // 定义捷径的i18n语言资源
     i18nMap: {
         'zh-CN': {
-            'pluginName': 'AI 生图多模型（AimaxHug）',
+            'pluginName': 'AI 生文多模型（AimaxHug）',
             'prompt': '提示词',
             'promptPlaceholder': '请输入您的指令或问题...',
             'attachment': '参考图',
@@ -36,7 +36,7 @@ fieldDecoratorKit.setDecorator({
             'err_service': '服务执行异常，请稍后重试'
         },
         'en-US': {
-            'pluginName': 'AI Image Generation Multi-Model (AimaxHug)',
+            'pluginName': 'AI Text Generation Multi-Model (AimaxHug)',
             'prompt': 'Prompt',
             'promptPlaceholder': 'Please enter your instructions or questions...',
             'attachment': 'Reference Image',
@@ -58,7 +58,7 @@ fieldDecoratorKit.setDecorator({
             'err_service': 'Service execution exception'
         },
         'ja-JP': {
-            'pluginName': 'AI Image Generation Multi-Model (AimaxHug)',
+            'pluginName': 'AIテキスト生成マルチモデル（AimaxHug）',
             'prompt': 'プロンプト',
             'promptPlaceholder': '指示または質問を入力してください...',
             'attachment': '参考画像',
