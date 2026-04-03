@@ -152,7 +152,7 @@ fieldDecoratorKit.setDecorator({
         required: true,
         instructionsUrl: "https://aimaxhug.com/",
         label: 'aimaxhug',
-        tooltips: 'https://zhikemax.feishu.cn/wiki/L26mwubn8i5c65kYgSocKVNenpd',
+        tooltips: 'https://alidocs.dingtalk.com/i/nodes/NkDwLng8ZLy5rXjYfa7y9R15VKMEvZBY',
         icon: {
             light: 'https://yinshan-1300111615.cos.ap-chengdu.myqcloud.com/aimaxhug/logo.png',
             dark: 'https://yinshan-1300111615.cos.ap-chengdu.myqcloud.com/aimaxhug/logo.png'
@@ -174,6 +174,7 @@ fieldDecoratorKit.setDecorator({
                 AI_SERVICE_URL1,
                 {
                     method: 'POST',
+                    headers:{'Content-Type': 'application/json'},
                     body: JSON.stringify(requestBody)
                 }, 'auth_id');
 
