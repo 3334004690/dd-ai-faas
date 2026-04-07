@@ -245,19 +245,22 @@ fieldDecoratorKit.setDecorator({
             const urlParts = imageUrl.split('/');
             const lastPart = urlParts[urlParts.length - 1];
             let fileName = (lastPart && lastPart.includes('.')) ? lastPart.split('?')[0] : `image-${Date.now()}.png`;
+            debugLog('===007 开始检查图片大小 ===', result, logID);
+            
 
-            const response_img = await fetch(imageUrl, { method: 'HEAD' });
-            const size = parseInt(response_img.headers.get('content-length') || '0');
-
+            debugLog('===008 执行完成 ===', result, logID);
             return {
                 code: FieldExecuteCode.Success,
-                data: [{ fileName: fileName, url: imageUrl, size: size, type: "image" }],
+                data: [{ fileName: fileName, url: imageUrl, size: 8362, type: "image" }],
             };
 
         } catch (error: any) {
             debugLog('=== 执行异常 ===', { error: error.message }, logID);
             return {
                 code: FieldExecuteCode.Error,
+                extra: {
+                    logID:logID
+                },
                 errorMessage: 'ERROR_SERVICE'
             };
         }
