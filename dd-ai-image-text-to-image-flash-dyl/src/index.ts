@@ -177,10 +177,7 @@ fieldDecoratorKit.setDecorator({
     authorizations: {
         id: 'aimaxhug_auth',
         platform: 'aimaxhug',
-        type: AuthorizationType.MultiHeaderToken,
-        params: [
-            { key: "Authorization", placeholder: t('apiKeyPlaceholder') }
-        ],
+        type: AuthorizationType.HeaderBearerToken,
         required: true,
         instructionsUrl: "https://aimaxhug.com/",
         label: 'aimaxhug',
