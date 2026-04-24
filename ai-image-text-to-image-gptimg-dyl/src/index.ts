@@ -84,7 +84,7 @@ fieldDecoratorKit.setDecorator({
                 mode: 'multiple',
                 supportTypes: [FieldType.Attachment]
             },
-             validator: { required: true },
+             validator: { required: false },
             tooltips: { title: t('p_img') }
         },
         {
@@ -113,7 +113,7 @@ fieldDecoratorKit.setDecorator({
                     { key: '480x3840', title: '1:8' }
                 ],
             }
-            , validator: { required: true }
+            , validator: { required: false }
         },
     ],
 
