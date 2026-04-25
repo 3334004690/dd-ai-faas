@@ -13,8 +13,8 @@ fieldDecoratorKit.setDomainList([
 
 // 环境与 URL 配置
 const ENV_CONFIG = {
-    PROD: 'https://base-api.aimaxhug.com/api/v1/gpt-image-2/imageToImage',
-    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/gpt-image-2/imageToImage'
+    PROD: 'https://base-api.aimaxhug.com/api/v2/gpt-image-2/imageToImageToGw',
+    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v2/gpt-image-2/imageToImageToGw'
 } as const;
 
 /**
