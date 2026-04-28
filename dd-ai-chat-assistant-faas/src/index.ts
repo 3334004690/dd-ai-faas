@@ -2,12 +2,17 @@ import { FieldType, fieldDecoratorKit, FormItemComponent, FieldExecuteCode, Auth
 const { t } = fieldDecoratorKit;
 
 // 通过addDomainList添加请求接口的域名
-fieldDecoratorKit.setDomainList(['base-api.aimaxhug.com', 'yi-test.aimaxhug.com', 'stag-base-api.aimaxhug.com']);
+fieldDecoratorKit.setDomainList(['base-api.aimaxhug.com', 'jia-test.aimaxhug.com', 'stag-base-api.aimaxhug.com']);
 
 // ==================== 1. 基础配置与工具模块 ====================
 import { v4 as uuidv4 } from 'uuid';
 
-const AI_SERVICE_URL1 = 'https://base-api.aimaxhug.com/api/v1/chat'; // 生产环境
+const ENV_CONFIG = {
+    PROD: 'https://base-api.aimaxhug.com/api/v1/imageToImage',
+    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/imageToImage'
+} as const;
+const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
+const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
     name: 'AI 生文多模型（AimaxHug）',
@@ -33,7 +38,22 @@ fieldDecoratorKit.setDecorator({
             'err_403': '无权限访问，请检查账号权限',
             'err_500': '服务器内部错误，请联系技术支持',
             'err_unknown': '服务器返回未知异常',
-            'err_service': '服务执行异常，请稍后重试'
+            'err_service': '服务执行异常，请稍后重试',
+
+            'sourceContent_label': '音视频文件',
+            'sourceContentTooltip': '1.支持本地音视频文件或抖音、B站、小红书、快手、tiktok、YouTube等50+平台网站的视频链接 2.链接请选择分享，复制的视频链接，而非网站链接 3.选择此项会增加额外的计费',
+            'contentSource_label': '音视频获取信息',
+            'contentSource_placeholder': '选择信息排序同生成结果排序',
+            'contentSource_tooltip': '1.此处选项优先级高于任务描述 2.若勾选信息内容，则依此输出；若无选项，则以任务描述内容输出',
+            'contentSource_option_original': '原文提取',
+            'contentSource_option_original_title': '原标题提取',
+            'contentSource_option_ai_generated': '内容摘要',
+            'contentSource_option_key_points': '关键点',
+            'contentSource_option_title_suggestions': '标题改写',
+            'enableWeb_label': '联网功能',
+            'enableWeb_tooltip': '1.选择此项会增加额外的计费',
+            'enableWeb_option_false': '关闭',
+            'enableWeb_option_true': '开启'
         },
         'en-US': {
             'pluginName': 'AI Text Generation Multi-Model (AimaxHug)',
@@ -55,7 +75,22 @@ fieldDecoratorKit.setDecorator({
             'err_403': 'Access denied, please check permissions',
             'err_500': 'Internal server error',
             'err_unknown': 'Unknown server error',
-            'err_service': 'Service execution exception'
+            'err_service': 'Service execution exception',
+
+            'sourceContent_label': 'Audio/Video File',
+            'sourceContentTooltip': '1. Supports local audio/video files or video links from 50+ platforms such as Douyin, Bilibili, Xiaohongshu, Kuaishou, TikTok, YouTube, etc. 2. For links, please select the share option and copy the video link, not the website link. 3. Selecting this option will incur additional charges.',
+            'contentSource_label': 'Audio/Video Info Extraction',
+            'contentSource_placeholder': 'Select info order (same as output order)',
+            'contentSource_tooltip': '1. Options here take precedence over task description. 2. If info options are selected, output follows them; if none selected, output follows task description.',
+            'contentSource_option_original': 'Original Text',
+            'contentSource_option_original_title': 'Original Title',
+            'contentSource_option_ai_generated': 'Summary',
+            'contentSource_option_key_points': 'Key Points',
+            'contentSource_option_title_suggestions': 'Title Rewrites',
+            'enableWeb_label': 'Web Search',
+            'enableWeb_tooltip': '1. Selecting this option will incur additional charges.',
+            'enableWeb_option_false': 'Off',
+            'enableWeb_option_true': 'On'
         },
         'ja-JP': {
             'pluginName': 'AIテキスト生成マルチモデル（AimaxHug）',
@@ -77,7 +112,22 @@ fieldDecoratorKit.setDecorator({
             'err_403': 'アクセス権限がありません',
             'err_500': 'サーバー内部エラーが発生しました',
             'err_unknown': '不明なサーバーエラーが発生しました',
-            'err_service': 'サービスの実行中に例外が発生しました'
+            'err_service': 'サービスの実行中に例外が発生しました',
+
+            'sourceContent_label': '音声・動画ファイル',
+            'sourceContentTooltip': '1. ローカルの音声・動画ファイル、またはDouyin、Bilibili、Xiaohongshu、Kuaishou、TikTok、YouTubeなど50以上のプラットフォームの動画リンクに対応 2. リンクは共有オプションを選択し、動画リンク（ウェブサイトリンクではない）をコピーしてください 3. このオプションを選択すると追加料金が発生します',
+            'contentSource_label': '音声・動画情報取得',
+            'contentSource_placeholder': '情報の並び順を選択（生成結果の並び順と同じ）',
+            'contentSource_tooltip': '1. ここのオプションはタスクの説明よりも優先されます 2. 情報オプションが選択されている場合はその出力に従い、オプションが選択されていない場合はタスクの説明に従って出力されます',
+            'contentSource_option_original': '原文抽出',
+            'contentSource_option_original_title': '元タイトル抽出',
+            'contentSource_option_ai_generated': 'コンテンツ要約',
+            'contentSource_option_key_points': 'キーポイント',
+            'contentSource_option_title_suggestions': 'タイトル書き換え',
+            'enableWeb_label': 'ネットワーク機能',
+            'enableWeb_tooltip': '1. このオプションを選択すると追加料金が発生します',
+            'enableWeb_option_false': 'オフ',
+            'enableWeb_option_true': 'オン'
         },
     },
 
@@ -116,6 +166,33 @@ fieldDecoratorKit.setDecorator({
             tooltips: { title: t('attachmentTips') }
         },
         {
+            key: 'source_content',
+            label: t('sourceContent_label'),
+            component: FormItemComponent.FieldSelect,
+            props: {
+            supportTypes: [FieldType.Attachment, FieldType.Text, FieldType.Link]
+            },
+            validator: { required: false },
+            tooltips: { title: t('sourceContentTooltip') },
+        },
+        {
+            key: 'content_source',
+            label: t('contentSource_label'),
+            component: FormItemComponent.MultiSelect,
+            props: {
+            placeholder: t('contentSource_placeholder'),
+            options: [
+                { title: t('contentSource_option_original'), key: 'original' },
+                { title: t('contentSource_option_original_title'), key: 'original_title' },
+                { title: t('contentSource_option_ai_generated'), key: 'ai_generated' },
+                { title: t('contentSource_option_key_points'), key: 'key_points' },
+                { title: t('contentSource_option_title_suggestions'), key: 'title_suggestions' },
+            ]
+            },
+            validator: { required: false },
+            tooltips: { title: t('contentSource_tooltip') },
+        },
+        {
             key: 'system_prompt',
             label: t('systemPrompt'),
             component: FormItemComponent.Textarea,
@@ -135,6 +212,20 @@ fieldDecoratorKit.setDecorator({
             },
             validator: { required: false },
             tooltips: { title: t('modelTips') }
+        },
+        {
+            key: 'enable_web',
+            label: t('enableWeb_label'),
+            component: FormItemComponent.Radio,
+            props: {
+            defaultValue: 'false',
+            options: [
+                { label: t('enableWeb_option_false'), value: "false" },
+                { label: t('enableWeb_option_true'), value: "true" }
+            ]
+            },
+            validator: { required: false },
+            tooltips: { title: t('enableWeb_tooltip') },
         }
     ],
 
@@ -168,7 +259,7 @@ fieldDecoratorKit.setDecorator({
             const requestBody = buildRequestBody(formData, logID);
 
             const response = await context.fetch(
-                AI_SERVICE_URL1,
+                SERVICE_URL,
                 {
                     method: 'POST',
                     headers:{'Content-Type': 'application/json'},

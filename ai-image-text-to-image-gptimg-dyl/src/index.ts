@@ -1,119 +1,179 @@
 import { FieldType, fieldDecoratorKit, FormItemComponent, FieldExecuteCode, AuthorizationType } from 'dingtalk-docs-cool-app';
-import { v4 as uuidv4 } from 'uuid';
-
 const { t } = fieldDecoratorKit;
 
-// ==================== 1. 环境配置与域名白名单 ====================
+// 通过addDomainList添加请求接口的域名
+fieldDecoratorKit.setDomainList(['base-api.aimaxhug.com', 'jia-test.aimaxhug.com', 'stag-base-api.aimaxhug.com']);
 
-// 域名白名单配置
-fieldDecoratorKit.setDomainList([
-    'base-api.aimaxhug.com',
-    'jia-test.aimaxhug.com'
-]);
+// ==================== 1. 基础配置与工具模块 ====================
+import { v4 as uuidv4 } from 'uuid';
 
-// 环境与 URL 配置
 const ENV_CONFIG = {
-    PROD: 'https://base-api.aimaxhug.com/api/v2/gpt-image-2/imageToImageToGw',
-    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v2/gpt-image-2/imageToImageToGw'
+    PROD: 'https://base-api.aimaxhug.com/api/v1/imageToImage',
+    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/imageToImage'
 } as const;
-
-/**
- * 【环境切换开关】：修改此处即可切换请求环境
- * 可选值: 'PROD' | 'TEST' | 'STAG'
- */
-const ACTIVE_ENV: keyof typeof ENV_CONFIG = 'PROD'; 
-const SERVICE_URL = ENV_CONFIG[ACTIVE_ENV];
+const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
+const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
-    name: 'AI 图文生图（GPT-Image-2）',
-
-    // ==================== 2. 国际化 (参考钉钉版本同步) ====================
+    name: 'AI 生图多模型（Gpt-image-2）',
+    // 定义捷径的i18n语言资源 [cite: 2]
     i18nMap: {
         'zh-CN': {
-            'pluginName': 'AI 图文生图（GPT-Image-2）',
-            'label_prompt': '提示词',
-            'p_prompt': '请输入提示词，描述你想要的画面',
-            'label_img': '原始图片',
-            'p_img': '请上传参考图片',
-            'label_res': '生成比例',
-            'res_auto': '默认',
-            'err_no_img': '未获取到生成的图片地址',
-            'err_fetch': '服务执行异常，请稍后重试',
+            'pluginName': 'AI 生图多模型（Gpt-image-2）',
+            'modelLabel': 'AI 模型',
+            'modelPlaceholder': '请输入生成图片的AI模型,支持模型:gemini系列、gpt-image系列、seedream系列 等',
+            'imageLabel': '原始图片',
+            'imageTips': '请注意：1.gemini pro最多支持14张参考图，每张大小不超过7MB；最多6张可保持对象高保真，最多5张可保持角色高保真；2.gemini 2最多支持14张参考图，最多10张可保持对象高保真，最多4张可保持角色高保真；',
+            'promptLabel': '提示词',
+            'promptPlaceholder': '请输入你希望AI完成的任务',
+            'resLabel': '分辨率',
+            'resPlaceholder': '请注意：1.选择的分辨率只对gemini模型生效；2.gpt模型分为普通及4k模型，普通模型默认出图1k，特定尺寸比例支持对应分辨率，如：1:1支持2k，9:16和16:9支持4k；4k模型支持2k及以上分辨率',
+            'propLabel': '比例',
+            'mr': '默认',
+            'propPlaceholder': '请注意：1.gpt模型分为普通及4k模型，普通模型默认出图1k，特定尺寸比例支持对应分辨率，如：1:1支持2k，9:16和16:9支持4k；4k模型支持2k及以上分辨率',
+            'apiKeyPlaceholder': '请输入您的 API Key (例如: Bearer xxx)',
+            // 错误提示 [cite: 12]
+            'err_format': '后端服务器返回了无效的响应格式',
+            'err_no_url': '未获取到生成的图片地址',
+            'err_400': '请求参数错误，请检查输入内容',
             'err_401': '认证失败，请检查 API Key',
             'err_403': '无权限访问',
-            'err_500': '服务器内部错误'
+            'err_500': '服务器内部错误',
+            'err_unknown': '服务器返回未知异常',
+            'err_service': '服务执行异常，请稍后重试'
         },
         'en-US': {
-            'pluginName': 'AI Image Generation (AimaxHug)',
-            'label_prompt': 'Prompt',
-            'p_prompt': 'Enter your prompt here',
-            'label_img': 'Source Image',
-            'p_img': 'Upload a reference image',
-            'label_res': 'Resolution',
-            'res_auto': 'Auto',
-            'err_no_img': 'Failed to get image URL',
-            'err_fetch': 'Service execution error'
+            'pluginName': 'AI Image Generation Multi-Model (AimaxHug)',
+            'modelLabel': 'AI Model',
+            'modelPlaceholder': 'Select an AI model',
+            'imageLabel': 'Original Image',
+            'imageTips': 'Please upload the original image',
+            'promptLabel': 'Prompt',
+            'promptPlaceholder': 'Enter your prompt...',
+            'resLabel': 'Resolution',
+            'resPlaceholder': 'Select image resolution',
+            'propLabel': 'Proportion',
+            'propPlaceholder': 'Select image proportion',
+            'apiKeyPlaceholder': 'Enter API Key (e.g., Bearer xxx)',
+            'err_format': 'Invalid response format from server',
+            'err_no_url': 'Failed to get the generated image URL',
+            'err_400': 'Request parameter error',
+            'err_401': 'Authentication failed',
+            'err_403': 'Access denied',
+            'err_500': 'Internal server error',
+            'err_unknown': 'Unknown server error',
+            'err_service': 'Service execution exception'
+        },
+        'ja-JP': {
+            'pluginName': 'AI画像生成マルチモデル（AimaxHug）',
+            'modelLabel': 'AI モデル',
+            'modelPlaceholder': 'AI モデルを選択してください',
+            'imageLabel': '元の画像',
+            'imageTips': '元の画像をアップロードしてください',
+            'promptLabel': 'プロンプト',
+            'promptPlaceholder': 'プロンプトを入力してください...',
+            'resLabel': '解像度',
+            'resPlaceholder': '解像度を選択してください',
+            'propLabel': '比率',
+            'propPlaceholder': '比率を選択してください',
+            'apiKeyPlaceholder': 'APIキーを入力してください',
+            'err_format': 'サーバーからの応答形式が無効です',
+            'err_no_url': '生成された画像URLを取得できませんでした',
+            'err_400': 'リクエストパラメータのエラーです',
+            'err_401': '認証に失敗しました',
+            'err_403': 'アクセス権限がありません',
+            'err_500': 'サーバー内部エラーが発生しました',
+            'err_unknown': '不明なサーバーエラー',
+            'err_service': 'サービスの実行中に例外が発生しました'
         }
     },
 
+    // 定义错误信息集合（映射到 i18n 资源）
     errorMessages: {
-        'NO_IMAGE_URL': t('err_no_img'),
-        'ERROR_SERVICE': t('err_fetch'),
+        'INVALID_FORMAT': t('err_format'),
+        'NO_IMAGE_URL': t('err_no_url'),
+        'ERROR_400': t('err_400'),
         'ERROR_401': t('err_401'),
         'ERROR_403': t('err_403'),
         'ERROR_500': t('err_500'),
+        'ERROR_UNKNOWN': t('err_unknown'),
+        'ERROR_SERVICE': t('err_service'),
     },
 
-    // ==================== 3. UI 界面配置 (参考钉钉全量分辨率) ====================
     formItems: [
+
         {
             key: 'prompt',
-            label: t('label_prompt'),
+            label: t('promptLabel'),
             component: FormItemComponent.Textarea,
             props: {
-                placeholder: t('p_prompt'),
+                placeholder: t('promptPlaceholder'),
                 enableFieldReference: true
             },
             validator: { required: true }
         },
         {
             key: 'original_image',
-            label: t('label_img'),
+            label: t('imageLabel'),
             component: FormItemComponent.FieldSelect,
             props: {
                 mode: 'multiple',
                 supportTypes: [FieldType.Attachment]
             },
-             validator: { required: false },
-            tooltips: { title: t('p_img') }
+            validator: { required: false },
+            tooltips: { title: t('imageTips') }
         },
         {
             key: 'resolution',
-            label: t('label_res'),
+            label: t('resLabel'),
             component: FormItemComponent.SingleSelect,
             props: {
-                defaultValue: 'auto',
-                placeholder: t('label_res'),
-                // 全量抄写钉钉 15 种比例配置
+                defaultValue: '1k',
                 options: [
-                    { key: 'auto', title: t('res_auto') },
-                    { key: '3840x3840', title: '1:1' },
-                    { key: '3840x2880', title: '4:3' },
-                    { key: '2880x3840', title: '3:4' },
-                    { key: '3840x2560', title: '3:2' },
-                    { key: '2560x3840', title: '2:3' },
-                    { key: '3840x2160', title: '16:9' },
-                    { key: '2160x3840', title: '9:16' },
-                    { key: '3072x3840', title: '4:5' },
-                    { key: '3840x3072', title: '5:4' },
-                    { key: '3840x1644', title: '21:9' },
-                    { key: '3840x960', title: '4:1' },
-                    { key: '960x3840', title: '1:4' },
-                    { key: '3840x480', title: '8:1' },
-                    { key: '480x3840', title: '1:8' }
+                    { key: '1k', title: '1k' },
+                    { key: '2k', title: '2k' },
+                    { key: '4k', title: '4k' }
                 ],
-            }
-            , validator: { required: false }
+                placeholder: t('resPlaceholder')
+            },
+            validator: { required: false },
+            tooltips: { title: t('resPlaceholder') }
+        },
+        {
+            key: 'proportion',
+            label: t('propLabel'),
+            component: FormItemComponent.SingleSelect,
+            props: {
+                defaultValue: '',
+                options: [
+                     { key: '', title: t('mr') },
+                    { key: '1:1', title: '1:1' },
+                    { key: '9:16', title: '9:16' },
+                    { key: '16:9', title: '16:9' },
+                    { key: '2:3', title: '2:3' },
+                    { key: '3:2', title: '3:2' },
+                    { key: '3:4', title: '3:4' },
+                    { key: '4:3', title: '4:3' },
+                    { key: '4:5', title: '4:5' },
+                    { key: '5:4', title: '5:4' },
+                    { key: '21:9', title: '21:9' }
+                ],
+                placeholder: t('propPlaceholder')
+            },
+            validator: { required: false },
+            tooltips: { title: t('propPlaceholder') }
+        },
+        {
+            key: 'model',
+            label: t('modelLabel'),
+            component: FormItemComponent.Textarea,
+            props: {
+                placeholder: t('modelPlaceholder'),
+                enableFieldReference: true
+     
+            },
+            validator: { required: false },
+            tooltips: { title: t('modelPlaceholder') }
         },
     ],
 
@@ -121,7 +181,6 @@ fieldDecoratorKit.setDecorator({
         type: FieldType.Attachment,
     },
 
-    // ==================== 4. 鉴权配置 (原封不动，符合钉钉解析) ====================
     authorizations: {
         id: 'aimaxhug_auth',
         platform: 'aimaxhug',
@@ -136,81 +195,124 @@ fieldDecoratorKit.setDecorator({
         }
     },
 
-    // ==================== 5. 执行逻辑 (结合钉钉 Body 解析) ====================
     execute: async (context, formData) => {
-        const logID = context.extensionId || `DT_${uuidv4().substring(0, 8)}`;
-        debugLog('===001 执行开始 ===', { ACTIVE_ENV, formData }, logID);
+        const logID = context.extensionId || createUniqueId('DD_task');
+        debugLog('===001 钉钉执行开始 ===', { formData, baseId: context.baseId, sheetId: context.sheetId }, logID);
 
         try {
-            // 使用同步钉钉逻辑的 Body 构造器
             const requestBody = buildRequestBody(formData, logID);
 
             const response = await context.fetch(
                 SERVICE_URL,
                 {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers:{'Content-Type': 'application/json'},
                     body: JSON.stringify(requestBody)
-                }, 
-                'aimaxhug_auth'
-            );
+                }, 'aimaxhug_auth');
 
             const result = await response.json();
-            debugLog('===002 接收响应 ===', result, logID);
+            debugLog('===006 接收响应结果 ===', result, logID);
 
-            const statusVal = result.status ?? result.code;
+            const statusVal = (typeof result.status === 'number') ? result.status
+                : (typeof result.code === 'number' ? result.code : undefined);
 
-            if (statusVal !== 200) {
-                const errKeyMap: any = { 400: 'ERROR_400', 401: 'ERROR_401', 403: 'ERROR_403', 500: 'ERROR_500' };
+            if (!result || typeof result !== 'object' || typeof statusVal !== 'number') {
                 return {
                     code: FieldExecuteCode.Error,
-                    errorMessage: errKeyMap[statusVal] || 'ERROR_SERVICE'
+                    errorMessage: 'INVALID_FORMAT' // [cite: 12]
                 };
             }
 
-            const imageUrl = result.data?.imageUrl;
-            if (!imageUrl) {
-                return { code: FieldExecuteCode.Error, errorMessage: 'NO_IMAGE_URL' };
+            if (statusVal !== 200) {
+                let errKey = 'ERROR_UNKNOWN';
+                switch (statusVal) {
+                    case 400: errKey = 'ERROR_400'; break;
+                    case 401: errKey = 'ERROR_401'; break;
+                    case 403: errKey = 'ERROR_403'; break;
+                    case 500: errKey = 'ERROR_500'; break;
+                }
+                return {
+                    code: FieldExecuteCode.Error,
+                    errorMessage: errKey
+                };
             }
 
-            // 文件名处理
-            const fileName = imageUrl.split('/').pop()?.split('?')[0] || `ai_${Date.now()}.png`;
+            const { imageUrl } = extractResponseData(result);
+            if (!imageUrl) {
+                return {
+                    code: FieldExecuteCode.Error,
+                    errorMessage: 'NO_IMAGE_URL'
+                };
+            }
 
+            // 文件名处理逻辑
+            const urlParts = imageUrl.split('/');
+            const lastPart = urlParts[urlParts.length - 1];
+            let fileName = (lastPart && lastPart.includes('.')) ? lastPart.split('?')[0] : `image-${Date.now()}.png`;
+            debugLog('===007 开始检查图片大小 ===', result, logID);
+            
+
+            debugLog('===008 执行完成 ===', result, logID);
             return {
                 code: FieldExecuteCode.Success,
-                data: [{ 
-                    fileName: fileName, 
-                    url: imageUrl, 
-                    type: "image",
-                    size: result.data?.size || 1024 * 512
-                }],
+                data: [{ fileName: fileName, url: imageUrl, size: 8362, type: "image" }],
             };
 
         } catch (error: any) {
             debugLog('=== 执行异常 ===', { error: error.message }, logID);
             return {
                 code: FieldExecuteCode.Error,
-                errorMessage: 'ERROR_SERVICE',
-                extra: { logID }
+                extra: {
+                    logID:logID
+                },
+                errorMessage: 'ERROR_SERVICE'
             };
         }
     },
 });
 
-/**
- * 核心工具：深度 Body 构造器 (同步钉钉解析逻辑)
- */
+/************ 工具方法 (逻辑保持不变)   *********************** */
+
+const createUniqueId = (() => {
+    return (prefix = 'dingding') => `${prefix}_${uuidv4()}`;
+})();
+
+function extractResponseData(result: any) {
+    let imageUrl = null;
+    if (result?.data && typeof result.data === 'object') {
+        imageUrl = result.data.imageUrl || null;
+    }
+    return { imageUrl };
+}
+
+function debugLog(stepOrData: string | object, data?: any, logID?: string) {
+    const now = new Date();
+    const pad = (num: number): string => String(num).padStart(2, '0');
+    const timestamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    let logData: any = { timestamp, logID: logID || 'N/A' };
+    if (typeof stepOrData === 'object') {
+        logData = { ...logData, ...stepOrData };
+    } else {
+        logData.step = stepOrData;
+        if (data !== undefined) logData.data = data;
+    }
+    console.log(JSON.stringify(logData));
+}
+
 function buildRequestBody(params: any, logID?: string) {
-    const { prompt, original_image, resolution } = params;
+    const { model, original_image, prompt, resolution, proportion } = params;
 
-    // 辅助获取单选值
-    const getVal = (v: any) => (v && typeof v === 'object' ? (v.key || v.value || (Array.isArray(v) ? v[0]?.key : null)) : v);
+    const getSelectValue = (fieldValue: any) => {
+        if (!fieldValue) return null;
+        if (typeof fieldValue === 'string') return fieldValue;
+        return fieldValue.value || (Array.isArray(fieldValue) && fieldValue[0]?.value) || null;
+    };
 
-    // 钉钉版附件解析逻辑：支持嵌套数组和提取 tmp_url
     const processedAttachments: any[] = [];
     if (original_image) {
-        const pushAttachment = (item: any) => {
-            if (item && item.tmp_url) {
+        const items = Array.isArray(original_image) ? (Array.isArray(original_image[0]) ? original_image.flat() : original_image) : [original_image];
+        items.forEach((item: any) => {
+            if (item?.tmp_url) {
                 processedAttachments.push({
                     tmp_url: item.tmp_url,
                     name: item.name || '',
@@ -218,34 +320,22 @@ function buildRequestBody(params: any, logID?: string) {
                     size: item.size || 0
                 });
             }
-        };
-
-        if (Array.isArray(original_image)) {
-            original_image.forEach((item: any) => {
-                if (Array.isArray(item)) {
-                    item.forEach(subItem => pushAttachment(subItem));
-                } else {
-                    pushAttachment(item);
-                }
-            });
-        } else {
-            pushAttachment(original_image);
-        }
+        });
     }
 
-    const body = {
-        prompt: (prompt || '').trim(),
-        resolution: getVal(resolution) || 'auto',
-        model: 'gpt-image-2', // 固定模型名
-        original_image: processedAttachments
+    const requestBody: any = {
+        prompt: (typeof prompt === 'string' ? prompt.trim() : '')
     };
 
-    debugLog('=== Body 构造完成 ===', body, logID);
-    return body;
-}
+    if (processedAttachments.length > 0) requestBody.original_image = processedAttachments;
+    const res = getSelectValue(resolution);
+    if (res) requestBody.resolution = res;
+    const prop = getSelectValue(proportion);
+    if (prop) requestBody.proportion = prop;
+    const mdl = getSelectValue(model).trim() || 'gpt-image-2-4K';
+    if (mdl) requestBody.model = mdl;
 
-function debugLog(step: string, data: any, logID: string) {
-    console.log(JSON.stringify({ timestamp: new Date().toISOString(), logID, step, data }));
+    return requestBody;
 }
 
 export default fieldDecoratorKit;

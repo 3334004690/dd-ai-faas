@@ -2,29 +2,35 @@ import { FieldType, fieldDecoratorKit, FormItemComponent, FieldExecuteCode, Auth
 const { t } = fieldDecoratorKit;
 
 // 通过addDomainList添加请求接口的域名
-fieldDecoratorKit.setDomainList(['base-api.aimaxhug.com', 'yi-test.aimaxhug.com', 'stag-base-api.aimaxhug.com']);
+fieldDecoratorKit.setDomainList(['base-api.aimaxhug.com', 'jia-test.aimaxhug.com', 'stag-base-api.aimaxhug.com']);
 
 // ==================== 1. 基础配置与工具模块 ====================
 import { v4 as uuidv4 } from 'uuid';
 
-const AI_SERVICE_URL1 = 'https://base-api.aimaxhug.com/api/v1/imageToImage'; // 生产环境
+const ENV_CONFIG = {
+    PROD: 'https://base-api.aimaxhug.com/api/v1/imageToImage',
+    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/imageToImage'
+} as const;
+const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
+const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
-    name: 'AI 生文多模型（AimaxHug）',
+    name: 'AI 生图多模型（Gemini-3-pro）',
     // 定义捷径的i18n语言资源 [cite: 2]
     i18nMap: {
         'zh-CN': {
-            'pluginName': 'AI 生文多模型（AimaxHug）',
+            'pluginName': 'AI 生图多模型（Gemini-3-pro）',
             'modelLabel': 'AI 模型',
-            'modelPlaceholder': '请选择生成图片的 AI 模型',
+            'modelPlaceholder': '请输入生成图片的AI模型,支持模型:gemini系列、gpt-image系列、seedream系列 等',
             'imageLabel': '原始图片',
-            'imageTips': '请上传原始图片',
+            'imageTips': '请注意：1.gemini pro最多支持14张参考图，每张大小不超过7MB；最多6张可保持对象高保真，最多5张可保持角色高保真；2.gemini 2最多支持14张参考图，最多10张可保持对象高保真，最多4张可保持角色高保真；',
             'promptLabel': '提示词',
-            'promptPlaceholder': '请输入您的提示词...',
+            'promptPlaceholder': '请输入你希望AI完成的任务',
             'resLabel': '分辨率',
-            'resPlaceholder': '选择生成图片的分辨率',
+            'resPlaceholder': '请注意：1.选择的分辨率只对gemini模型生效；2.gpt模型分为普通及4k模型，普通模型默认出图1k，特定尺寸比例支持对应分辨率，如：1:1支持2k，9:16和16:9支持4k；4k模型支持2k及以上分辨率',
             'propLabel': '比例',
-            'propPlaceholder': '选择生成图片的比例',
+            'mr': '默认',
+            'propPlaceholder': '请注意：1.gpt模型分为普通及4k模型，普通模型默认出图1k，特定尺寸比例支持对应分辨率，如：1:1支持2k，9:16和16:9支持4k；4k模型支持2k及以上分辨率',
             'apiKeyPlaceholder': '请输入您的 API Key (例如: Bearer xxx)',
             // 错误提示 [cite: 12]
             'err_format': '后端服务器返回了无效的响应格式',
@@ -95,22 +101,16 @@ fieldDecoratorKit.setDecorator({
     },
 
     formItems: [
+
         {
-            key: 'model',
-            label: t('modelLabel'),
-            component: FormItemComponent.SingleSelect,
+            key: 'prompt',
+            label: t('promptLabel'),
+            component: FormItemComponent.Textarea,
             props: {
-                defaultValue: 'nano_banana',
-                options: [
-                    { key: 'nano_banana', title: 'Nano Banana Pro' },
-                    { key: 'nano_banana_2', title: 'Nano Banana 2' },
-                    { key: 'seed_dream', title: 'Seed Dream' },
-                    { key: 'qwen_image', title: 'Qwen Image' }
-                ],
-                placeholder: t('modelPlaceholder'),
+                placeholder: t('promptPlaceholder'),
+                enableFieldReference: true
             },
-            validator: { required: true },
-            tooltips: { title: t('modelPlaceholder') }
+            validator: { required: true }
         },
         {
             key: 'original_image',
@@ -120,19 +120,8 @@ fieldDecoratorKit.setDecorator({
                 mode: 'multiple',
                 supportTypes: [FieldType.Attachment]
             },
-            validator: { required: true },
+            validator: { required: false },
             tooltips: { title: t('imageTips') }
-        },
-        {
-            key: 'prompt',
-            label: t('promptLabel'),
-            component: FormItemComponent.Textarea,
-            props: {
-                placeholder: t('promptPlaceholder'),
-                enableFieldReference: true
-            },
-            validator: { required: true },
-            tooltips: { title: t('promptLabel') }
         },
         {
             key: 'resolution',
@@ -155,19 +144,37 @@ fieldDecoratorKit.setDecorator({
             label: t('propLabel'),
             component: FormItemComponent.SingleSelect,
             props: {
-                defaultValue: '1:1',
+                defaultValue: '',
                 options: [
+                     { key: '', title: t('mr') },
                     { key: '1:1', title: '1:1' },
-                    { key: '3:4', title: '3:4' },
                     { key: '9:16', title: '9:16' },
                     { key: '16:9', title: '16:9' },
-                    { key: '4:3', title: '4:3' }
+                    { key: '2:3', title: '2:3' },
+                    { key: '3:2', title: '3:2' },
+                    { key: '3:4', title: '3:4' },
+                    { key: '4:3', title: '4:3' },
+                    { key: '4:5', title: '4:5' },
+                    { key: '5:4', title: '5:4' },
+                    { key: '21:9', title: '21:9' }
                 ],
                 placeholder: t('propPlaceholder')
             },
             validator: { required: false },
             tooltips: { title: t('propPlaceholder') }
-        }
+        },
+        {
+            key: 'model',
+            label: t('modelLabel'),
+            component: FormItemComponent.Textarea,
+            props: {
+                placeholder: t('modelPlaceholder'),
+                enableFieldReference: true
+     
+            },
+            validator: { required: false },
+            tooltips: { title: t('modelPlaceholder') }
+        },
     ],
 
     resultType: {
@@ -196,7 +203,7 @@ fieldDecoratorKit.setDecorator({
             const requestBody = buildRequestBody(formData, logID);
 
             const response = await context.fetch(
-                AI_SERVICE_URL1,
+                SERVICE_URL,
                 {
                     method: 'POST',
                     headers:{'Content-Type': 'application/json'},
@@ -325,7 +332,7 @@ function buildRequestBody(params: any, logID?: string) {
     if (res) requestBody.resolution = res;
     const prop = getSelectValue(proportion);
     if (prop) requestBody.proportion = prop;
-    const mdl = getSelectValue(model);
+    const mdl = getSelectValue(model).trim() || 'gemini-3-pro-image-preview';
     if (mdl) requestBody.model = mdl;
 
     return requestBody;
