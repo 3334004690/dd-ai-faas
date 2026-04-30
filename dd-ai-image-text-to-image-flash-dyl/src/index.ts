@@ -332,7 +332,7 @@ function buildRequestBody(params: any, logID?: string) {
     if (res) requestBody.resolution = res;
     const prop = getSelectValue(proportion);
     if (prop) requestBody.proportion = prop;
-    const mdl = getSelectValue(model).trim() || 'gemini-3-pro-image-preview';
+    const mdl = getSelectValue(model) || 'gemini-3-pro-image-preview';
     if (mdl) requestBody.model = mdl;
 
     return requestBody;

@@ -332,7 +332,7 @@ function buildRequestBody(params: any, logID?: string) {
     if (res) requestBody.resolution = res;
     const prop = getSelectValue(proportion);
     if (prop) requestBody.proportion = prop;
-    const mdl = getSelectValue(model).trim() || 'gpt-image-2-4K';
+    const mdl = getSelectValue(model) || 'gpt-image-2-4K';
     if (mdl) requestBody.model = mdl;
 
     return requestBody;
