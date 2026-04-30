@@ -21,7 +21,7 @@ fieldDecoratorKit.setDecorator({
         'zh-CN': {
             'pluginName': 'AI 生图多模型（Gemini-3-pro）',
             'modelLabel': 'AI 模型',
-            'modelPlaceholder': '请输入生成图片的AI模型,支持模型:gemini系列、gpt-image系列、seedream系列 等',
+            'modelPlaceholder': '支持 gemini、gpt-image、seedream 等系列，请从官网 https://www.aimaxhug.com 的模型广场直接复制完整模型名称，若不指定则系统自动使用默认模型生成图片',
             'imageLabel': '原始图片',
             'imageTips': '请注意：1.gemini pro最多支持14张参考图，每张大小不超过7MB；最多6张可保持对象高保真，最多5张可保持角色高保真；2.gemini 2最多支持14张参考图，最多10张可保持对象高保真，最多4张可保持角色高保真；',
             'promptLabel': '提示词',
@@ -172,8 +172,8 @@ fieldDecoratorKit.setDecorator({
                 enableFieldReference: true
      
             },
-            validator: { required: false },
-            tooltips: { title: t('modelPlaceholder') }
+            validator: { required: false }
+            // tooltips: { title: t('modelPlaceholder') }
         },
     ],
 

@@ -15,13 +15,13 @@ const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
 const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
-    name: 'AI 生图多模型（Gpt-image-2）',
+    name: 'AI 生图多模型 https://www.aimaxhug.com ',
     // 定义捷径的i18n语言资源 [cite: 2]
     i18nMap: {
         'zh-CN': {
             'pluginName': 'AI 生图多模型（Gpt-image-2）',
             'modelLabel': 'AI 模型',
-            'modelPlaceholder': '请输入生成图片的AI模型,支持模型:gemini系列、gpt-image系列、seedream系列 等',
+            'modelPlaceholder': '支持 gemini、gpt-image、seedream 等系列，请从官网 https://www.aimaxhug.com 的模型广场直接复制完整模型名称，若不指定则系统自动使用默认模型生成图片',
             'imageLabel': '原始图片',
             'imageTips': '请注意：1.gemini pro最多支持14张参考图，每张大小不超过7MB；最多6张可保持对象高保真，最多5张可保持角色高保真；2.gemini 2最多支持14张参考图，最多10张可保持对象高保真，最多4张可保持角色高保真；',
             'promptLabel': '提示词',
@@ -45,7 +45,7 @@ fieldDecoratorKit.setDecorator({
         'en-US': {
             'pluginName': 'AI Image Generation Multi-Model (AimaxHug)',
             'modelLabel': 'AI Model',
-            'modelPlaceholder': 'Select an AI model',
+            'modelPlaceholder': '1. Manual entry prohibited: Do not type the model name yourself. You must copy the complete and accurate model name directly from the official Model Plaza. 2. Default model rule: If no model series or name is specified, the system will automatically use the default model for image generation. 3. Supported model series: gemini series, gpt-image series, seedream series, etc. 4. Official website: https://www.aimaxhug.com/',
             'imageLabel': 'Original Image',
             'imageTips': 'Please upload the original image',
             'promptLabel': 'Prompt',
@@ -67,7 +67,7 @@ fieldDecoratorKit.setDecorator({
         'ja-JP': {
             'pluginName': 'AI画像生成マルチモデル（AimaxHug）',
             'modelLabel': 'AI モデル',
-            'modelPlaceholder': 'AI モデルを選択してください',
+            'modelPlaceholder': '1. 手入力禁止：モデル名を自分で入力しないでください。公式サイトのモデル広場から完全かつ正確なモデル名を直接コピーする必要があります。2. デフォルトモデルルール：モデルシリーズと名前を指定しない場合、システムはデフォルトモデルを自動的に使用して画像を生成します。3. サポート対象モデルシリーズ：geminiシリーズ、gpt-imageシリーズ、seedreamシリーズなど。4. 公式サイト：https://www.aimaxhug.com/',
             'imageLabel': '元の画像',
             'imageTips': '元の画像をアップロードしてください',
             'promptLabel': 'プロンプト',
@@ -172,8 +172,8 @@ fieldDecoratorKit.setDecorator({
                 enableFieldReference: true
      
             },
-            validator: { required: false },
-            tooltips: { title: t('modelPlaceholder') }
+            validator: { required: false }
+            // tooltips: { title: t('modelPlaceholder') }
         },
     ],
 
