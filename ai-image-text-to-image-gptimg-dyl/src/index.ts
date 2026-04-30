@@ -15,7 +15,7 @@ const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
 const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
-    name: 'AI 生图多模型 https://www.aimaxhug.com ',
+    name: 'AI 生图多模型(Gpt-image-2) https://www.aimaxhug.com ',
     // 定义捷径的i18n语言资源 [cite: 2]
     i18nMap: {
         'zh-CN': {
