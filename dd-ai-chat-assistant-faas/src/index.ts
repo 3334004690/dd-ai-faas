@@ -7,9 +7,15 @@ fieldDecoratorKit.setDomainList(['base-api.aimaxhug.com', 'jia-test.aimaxhug.com
 // ==================== 1. 基础配置与工具模块 ====================
 import { v4 as uuidv4 } from 'uuid';
 
+
+// 定义全量通用的音视频后缀
+const ALLOWED_VIDEO_EXT = ['mp4', 'mov', 'avi', 'mkv', 'flv', 'wmv', 'webm', 'm4v', 'mpg', 'mpeg', '3gp', 'rmvb', 'ts', 'vob'];
+const ALLOWED_AUDIO_EXT = ['mp3', 'wav', 'm4a', 'aac', 'flac', 'ogg', 'wma', 'amr', 'ape', 'm4r'];
+const ALL_ALLOWED_EXT = [...ALLOWED_VIDEO_EXT, ...ALLOWED_AUDIO_EXT];
+
 const ENV_CONFIG = {
-    PROD: 'https://base-api.aimaxhug.com/api/v1/imageToImage',
-    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/imageToImage'
+    PROD: 'https://base-api.aimaxhug.com/api/v1/chat',
+    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/chat'
 } as const;
 const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
 const SERVICE_URL = ENV_CONFIG[USE_ENV];
@@ -258,6 +264,8 @@ fieldDecoratorKit.setDecorator({
             // const apiKey = getApiKeyFromConfig();
             const requestBody = buildRequestBody(formData, logID);
 
+            console.log(requestBody)
+
             const response = await context.fetch(
                 SERVICE_URL,
                 {
@@ -340,7 +348,7 @@ function debugLog(stepOrData: string | object, data?: any, logID?: string) {
 }
 
 function buildRequestBody(params: any, logID?: string): any {
-    const { model, message, system_prompt, attachment } = params;
+    const { model, message, system_prompt, attachment,enable_web,content_source,source_content } = params;
     const requestBody: any = {
         message: message?.trim() || ''
     };
@@ -359,7 +367,82 @@ function buildRequestBody(params: any, logID?: string): any {
                 size: item.size || 0
             }));
     }
+
+
     if (processedAttachments.length > 0) requestBody.attachment = processedAttachments;
+
+
+
+    if (source_content) {
+            // 逻辑 A: 处理附件数组
+        if (Array.isArray(source_content)) {
+            const items = source_content.flat().filter(item => item);
+            
+            // 优先检查：是否为附件文件 (含有 tmp_url)
+            const attachmentFiles = items.filter(item => item.tmp_url);
+            
+            if (attachmentFiles.length > 0) {
+                // 后缀校验
+                const invalidFiles = attachmentFiles.filter(f => {
+                    const ext = f.name?.split('.').pop()?.toLowerCase();
+                    return !ALL_ALLOWED_EXT.includes(ext);
+                });
+
+
+                requestBody.input_type = 'file';
+                requestBody.files = attachmentFiles.map(f => ({
+                    tmp_url: f.tmp_url,
+                    name: f.name,
+                    size: f.size,
+                    type: f.type
+                }));
+            } 
+            // 其次检查：结构化文本/链接对象 (type: 'url' 或 type: 'text')
+            else {
+                const firstUrlItem = items.find(i => i.type === 'url');
+                const textContent = items.filter(i => i.type === 'text').map(i => i.text).join('\n').trim();
+
+                if (firstUrlItem) {
+                    requestBody.input_type = 'url';
+                    requestBody.url_content = firstUrlItem.link || firstUrlItem.text;
+                } else if (textContent) {
+                    requestBody.input_type = 'url';
+                    requestBody.url_content = textContent;
+                }
+            }
+        }
+        // 逻辑 B: 处理文本或链接
+        else if (typeof source_content === 'string' && source_content.trim() !== '') {
+            requestBody.input_type = 'url'; // 对应 DTO 的 IsIn(['file', 'url'])
+            requestBody.url_content = source_content; // 对应 DTO 的 url_content 字段
+        }
+        // 逻辑 C: 处理单个附件对象
+        else if (typeof source_content === 'object' && source_content.tmp_url) {
+            const ext = source_content.name?.split('.').pop()?.toLowerCase();
+
+            requestBody.input_type = 'file';
+            requestBody.files = [{
+                tmp_url: source_content.tmp_url,
+                name: source_content.name,
+                size: source_content.size,
+                type: source_content.type
+            }];
+        }
+    }
+
+
+    if (enable_web === 'true'){  // 联网功能模型
+        requestBody.enable_web = true;
+    }else{
+        requestBody.enable_web = false;
+    }
+
+    if (content_source) { // 逻辑：处理内容源
+        requestBody.content_source = content_source.map(item => item).join(',');
+    }
+
+    // console.log(requestBody)
+
     return requestBody;
 }
 
