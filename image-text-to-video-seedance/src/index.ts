@@ -105,7 +105,7 @@ fieldDecoratorKit.setDecorator({
             'aspectLabel': '画面比例',
             'aspectTips': '选择自适应时，模型会读取输入图片的宽高比，避免裁切或加黑边（图生视频时推荐）。',
             'resolutionLabel': '分辨率',
-            'resolutionTips': '分辨率越高，消耗 token 越多，成本越高。原型调试建议用 480p，节省约 70% 成本。',
+            'resolutionTips': '分辨率越高，消耗 token 越多，成本越高。原型调试建议用 480p，节省约 70% 成本。1080p:Seedance 2.0 fast 不支持',
             'audioLabel': '生成原生音频',
             'audioTips': '开启后模型会联合生成与画面同步的音频，支持对话、音效、环境音、背景音乐。支持 8 种以上语言的唇形同步（口型同步）。',
             'cameraLabel': '固定镜头',
@@ -291,56 +291,55 @@ fieldDecoratorKit.setDecorator({
                 options: [
                     { key: '480p', title: '480p' },
                     { key: '720p', title: '720p' },
-                    { key: '1080p', title: '1080p' },
-                    { key: '2K', title: '2K' },
+                    { key: '1080p', title: '1080p' }
                 ],
                 placeholder: '默认720p'
             },
             validator: { required: false },
             tooltips: { title: t('resolutionTips') }
         },
-        {
-            key: 'generate_audio',
-            label: t('audioLabel'),
-            component: FormItemComponent.SingleSelect,
-            props: {
-                defaultValue: 'false',
-                options: [
-                    { key: 'false', title: t('off') },
-                    { key: 'true', title: t('on') },
-                ]
-            },
-            validator: { required: false },
-            tooltips: { title: t('audioTips') }
-        },
-        {
-            key: 'camera_fixed',
-            label: t('cameraLabel'),
-            component: FormItemComponent.SingleSelect,
-            props: {
-                defaultValue: 'false',
-                options: [
-                    { key: 'false', title: t('cameraOff') },
-                    { key: 'true', title: t('cameraOn') },
-                ]
-            },
-            validator: { required: false },
-            tooltips: { title: t('cameraTips') }
-        },
-        {
-            key: 'return_last_frame',
-            label: t('lastFrameLabel'),
-            component: FormItemComponent.SingleSelect,
-            props: {
-                defaultValue: 'false',
-                options: [
-                    { key: 'false', title: t('off') },
-                    { key: 'true', title: t('lastFrameOn') },
-                ]
-            },
-            validator: { required: false },
-            tooltips: { title: t('lastFrameTips') }
-        },
+        // {
+        //     key: 'generate_audio',
+        //     label: t('audioLabel'),
+        //     component: FormItemComponent.SingleSelect,
+        //     props: {
+        //         defaultValue: 'false',
+        //         options: [
+        //             { key: 'false', title: t('off') },
+        //             { key: 'true', title: t('on') },
+        //         ]
+        //     },
+        //     validator: { required: false },
+        //     tooltips: { title: t('audioTips') }
+        // },
+        // {
+        //     key: 'camera_fixed',
+        //     label: t('cameraLabel'),
+        //     component: FormItemComponent.SingleSelect,
+        //     props: {
+        //         defaultValue: 'false',
+        //         options: [
+        //             { key: 'false', title: t('cameraOff') },
+        //             { key: 'true', title: t('cameraOn') },
+        //         ]
+        //     },
+        //     validator: { required: false },
+        //     tooltips: { title: t('cameraTips') }
+        // },
+        // {
+        //     key: 'return_last_frame',
+        //     label: t('lastFrameLabel'),
+        //     component: FormItemComponent.SingleSelect,
+        //     props: {
+        //         defaultValue: 'false',
+        //         options: [
+        //             { key: 'false', title: t('off') },
+        //             { key: 'true', title: t('lastFrameOn') },
+        //         ]
+        //     },
+        //     validator: { required: false },
+        //     tooltips: { title: t('lastFrameTips') }
+        // },
     ],
 
     resultType: {
