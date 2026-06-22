@@ -178,7 +178,7 @@ fieldDecoratorKit.setDecorator({
                 enableFieldReference: true
             },
             validator: { required: false },
-            tooltips: { title: '1.注意：上传参考音频后，则【音色与提示词】不会生效；2.可用音色请参考文档：https://zhikemax.feishu.cn/wiki/Ad3Gw5urkipgggkGrJWc6m6Snae' }
+            tooltips: { title: '1.注意：上传参考音频后，则【音色与提示词】不会生效；2.可用音色请参考文档：https://alidocs.dingtalk.com/i/nodes/ZQYprEoWonD65ldoiBkGePv581waOeDk?utm_scene=person_space' }
         },
         {
             key: 'file',
