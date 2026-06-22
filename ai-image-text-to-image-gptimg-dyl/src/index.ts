@@ -11,7 +11,7 @@ const ENV_CONFIG = {
     PROD: 'https://base-api.aimaxhug.com/api/v1/imageToImage',
     LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v1/imageToImage'
 } as const;
-const USE_ENV = 'LOCAL' as keyof typeof ENV_CONFIG;
+const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
 const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
