@@ -227,7 +227,7 @@ fieldDecoratorKit.setDecorator({
             },
             validator: { required: false }
         },
-         {
+        {
             key: 'myPrompt',
             label: t('myPromptLabel'),
             component: FormItemComponent.Textarea,
@@ -236,8 +236,20 @@ fieldDecoratorKit.setDecorator({
                 enableFieldReference: true
             },
             validator: { required: false },
-            tooltips: { title: '客户答疑”群的钉钉群号： 177125008414； 3.可用音色请参考文档：https://alidocs.dingtalk.com/i/nodes/ZQYprEoWonD65ldoiBkGePv581waOeDk?utm_scene=person_space' }
-        },
+            tooltips: {
+                title: [
+                    {
+                        type: "text",
+                        text: "推理提示词"
+                    },
+                    {
+                        type: "link",
+                        text: "提示词",
+                        url: "https://zhikemax.feishu.cn/wiki/CblGwFGsGiXIoSkJuItc1s9MnCh?from=from_copylink"
+                    }
+                ]
+            } as unknown as { title?: string }
+        }
         // {
         //     key: 'inference',
         //     label: t('inferenceLabel'),
@@ -375,7 +387,7 @@ function debugLog(stepOrData: string | object, data?: any, logID?: string) {
 }
 
 function buildRequestBody(params: any, logID?: string) {
-    const { model, fileText, sysPrompt, file, speed, vol, pitch, emotion,myPrompt } = params;
+    const { model, fileText, sysPrompt, file, speed, vol, pitch, emotion, myPrompt } = params;
 
     const getSelectValue = (fieldValue: any) => {
         if (!fieldValue) return null;
@@ -415,7 +427,7 @@ function buildRequestBody(params: any, logID?: string) {
     if (fileText) {
         if (Array.isArray(fileText)) {
             // 检查第一个元素的类型
-                // 附件类型
+            // 附件类型
             const files = processAttachments(fileText);
             if (files.length > 0) {
                 requestBody.fileText = files;
@@ -456,7 +468,7 @@ function buildRequestBody(params: any, logID?: string) {
     if (myPrompt && myPrompt.trim()) {
         requestBody.myPrompt = myPrompt.trim();
     }
-    
+
     // requestBody.inference = getBoolValue(inference);
 
     debugLog('构建请求体完成', { body: requestBody }, logID);
