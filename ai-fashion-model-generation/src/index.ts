@@ -11,7 +11,7 @@ const ENV_CONFIG = {
     PROD: 'https://base-api.aimaxhug.com/api/v2/text-to-audio/fashionModelApiKey',
     LOCAL: 'http://jia-test.aimaxhug.com:3300/api/v2/fashionModelApiKey'
 } as const;
-const USE_ENV = 'LOCAL' as keyof typeof ENV_CONFIG;
+const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
 const SERVICE_URL = ENV_CONFIG[USE_ENV];
 
 fieldDecoratorKit.setDecorator({
