@@ -235,7 +235,7 @@ fieldDecoratorKit.setDecorator({
                 placeholder: t('myPromptPlaceholder'),
                 enableFieldReference: true
             },
-            validator: { required: false },
+            validator: { required: true },
             tooltips: {
                 title: [
                     {
