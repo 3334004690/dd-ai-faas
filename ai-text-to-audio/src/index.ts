@@ -245,7 +245,7 @@ fieldDecoratorKit.setDecorator({
                     {
                         type: "link",
                         text: "提示词",
-                        url: "https://zhikemax.feishu.cn/wiki/CblGwFGsGiXIoSkJuItc1s9MnCh?from=from_copylink"
+                        url: "https://alidocs.dingtalk.com/i/nodes/NDoBb60VLQX6xqeNUmlzLye1JlemrZQ3?utm_scene=person_space"
                     }
                 ]
             } as unknown as { title?: string }
