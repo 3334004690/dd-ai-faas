@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const ENV_CONFIG = {
     PROD: 'https://base-api.aimaxhug.com/api/v2/text-to-audio/speech',
-    LOCAL: 'http://jia-test.aimaxhug.com:3200/api/v2/text-to-audio/speech'
+    LOCAL: 'http://jia-test.aimaxhug.com:3300/api/v2/text-to-audio/speech'
 } as const;
 const USE_ENV = 'PROD' as keyof typeof ENV_CONFIG;
 const SERVICE_URL = ENV_CONFIG[USE_ENV];
@@ -30,6 +30,8 @@ fieldDecoratorKit.setDecorator({
             'filePlaceholder': '请选择克隆语音的原始音频',
             'fileTips': '支持 mp3、wav等常见音频格式，上传参考音频后，则【音色与提示词】不会生效',
             'inferenceLabel': '模型推理语气',
+            'myPromptLabel': '自定义提示词',
+            'myPromptPlaceholder': '请输入自定义的提示词，用于调整模型的推理',
             'speedLabel': '语速',
             'speedPlaceholder': '取值范围 0.5~2，默认 1.0',
             'volLabel': '音量',
@@ -61,6 +63,8 @@ fieldDecoratorKit.setDecorator({
             'filePlaceholder': 'Upload reference audio for timbre matching',
             'fileTips': 'Supports mp3, wav and other common audio formats',
             'inferenceLabel': 'Model Inference Tone',
+            'myPromptLabel': 'Custom Prompt',
+            'myPromptPlaceholder': 'Enter custom prompt to adjust model inference',
             'speedLabel': 'Speed',
             'speedPlaceholder': 'Range 0.5~2, default 1.0',
             'volLabel': 'Volume',
@@ -91,6 +95,8 @@ fieldDecoratorKit.setDecorator({
             'filePlaceholder': '音色合わせのための参照オーディオをアップロード',
             'fileTips': 'mp3、wavなど一般的な形式に対応',
             'inferenceLabel': 'モデル推論トーン',
+            'myPromptLabel': 'カスタムプロンプト',
+            'myPromptPlaceholder': 'カスタムプロンプトを入力してください、モデルの推論を調整する',
             'speedLabel': '速度',
             'speedPlaceholder': '範囲 0.5~2、デフォルト 1.0',
             'volLabel': '音量',
@@ -222,18 +228,41 @@ fieldDecoratorKit.setDecorator({
             validator: { required: false }
         },
         {
-            key: 'inference',
-            label: t('inferenceLabel'),
-            component: FormItemComponent.SingleSelect,
+            key: 'myPrompt',
+            label: t('myPromptLabel'),
+            component: FormItemComponent.Textarea,
             props: {
-                defaultValue: 'true',
-                options: [
-                    { key: 'false', title: '关闭' },
-                    { key: 'true', title: '开启（推荐）' }
-                ]
+                placeholder: t('myPromptPlaceholder'),
+                enableFieldReference: true
             },
-            validator: { required: false }
-        },
+            validator: { required: true },
+            tooltips: {
+                title: [
+                    {
+                        type: "text",
+                        text: "推理提示词"
+                    },
+                    {
+                        type: "link",
+                        text: "提示词",
+                        url: "https://alidocs.dingtalk.com/i/nodes/NDoBb60VLQX6xqeNUmlzLye1JlemrZQ3?utm_scene=person_space"
+                    }
+                ]
+            } as unknown as { title?: string }
+        }
+        // {
+        //     key: 'inference',
+        //     label: t('inferenceLabel'),
+        //     component: FormItemComponent.SingleSelect,
+        //     props: {
+        //         defaultValue: 'true',
+        //         options: [
+        //             { key: 'false', title: '关闭' },
+        //             { key: 'true', title: '开启（推荐）' }
+        //         ]
+        //     },
+        //     validator: { required: false }
+        // },
     ],
 
     resultType: {
@@ -358,7 +387,7 @@ function debugLog(stepOrData: string | object, data?: any, logID?: string) {
 }
 
 function buildRequestBody(params: any, logID?: string) {
-    const { model, fileText, sysPrompt, file, speed, vol, pitch, emotion, inference } = params;
+    const { model, fileText, sysPrompt, file, speed, vol, pitch, emotion, myPrompt } = params;
 
     const getSelectValue = (fieldValue: any) => {
         if (!fieldValue) return null;
@@ -398,7 +427,7 @@ function buildRequestBody(params: any, logID?: string) {
     if (fileText) {
         if (Array.isArray(fileText)) {
             // 检查第一个元素的类型
-                // 附件类型
+            // 附件类型
             const files = processAttachments(fileText);
             if (files.length > 0) {
                 requestBody.fileText = files;
@@ -436,8 +465,11 @@ function buildRequestBody(params: any, logID?: string) {
     if (emotionVal) {
         requestBody.emotion = emotionVal;
     }
+    if (myPrompt && myPrompt.trim()) {
+        requestBody.myPrompt = myPrompt.trim();
+    }
 
-    requestBody.inference = getBoolValue(inference);
+    // requestBody.inference = getBoolValue(inference);
 
     debugLog('构建请求体完成', { body: requestBody }, logID);
     return requestBody;
