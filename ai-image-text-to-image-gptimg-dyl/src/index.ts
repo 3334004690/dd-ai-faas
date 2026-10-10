@@ -29,6 +29,8 @@ fieldDecoratorKit.setDecorator({
             'resLabel': '分辨率',
             'resPlaceholder': '请注意：1.选择的分辨率只对gemini模型生效；2.gpt模型分为普通及4k模型，普通模型默认出图1k，特定尺寸比例支持对应分辨率，如：1:1支持2k，9:16和16:9支持4k；4k模型支持2k及以上分辨率',
             'propLabel': '比例',
+            'outputFormatLabel': '输出格式',
+            'outputFormatPlaceholder': '请选择输出格式',
             'mr': '默认',
             'propPlaceholder': '请注意：1.gpt模型分为普通及4k模型，普通模型默认出图1k，特定尺寸比例支持对应分辨率，如：1:1支持2k，9:16和16:9支持4k；4k模型支持2k及以上分辨率',
             'apiKeyPlaceholder': '请输入您的 API Key (例如: Bearer xxx)',
@@ -53,6 +55,8 @@ fieldDecoratorKit.setDecorator({
             'resLabel': 'Resolution',
             'resPlaceholder': 'Select image resolution',
             'propLabel': 'Proportion',
+            'outputFormatLabel': 'Output Format',
+            'outputFormatPlaceholder': 'Select output format',
             'propPlaceholder': 'Select image proportion',
             'apiKeyPlaceholder': 'Enter API Key (e.g., Bearer xxx)',
             'err_format': 'Invalid response format from server',
@@ -75,6 +79,8 @@ fieldDecoratorKit.setDecorator({
             'resLabel': '解像度',
             'resPlaceholder': '解像度を選択してください',
             'propLabel': '比率',
+            'outputFormatLabel': '出力形式',
+            'outputFormatPlaceholder': '出力形式を選択してください',
             'propPlaceholder': '比率を選択してください',
             'apiKeyPlaceholder': 'APIキーを入力してください',
             'err_format': 'サーバーからの応答形式が無効です',
@@ -164,6 +170,21 @@ fieldDecoratorKit.setDecorator({
             tooltips: { title: t('propPlaceholder') }
         },
         {
+            key: 'output_format',
+            label: t('outputFormatLabel'),
+            component: FormItemComponent.SingleSelect,
+            props: {
+                defaultValue: 'png',
+                options: [
+                    { key: 'jpeg', title: 'jpeg' },
+                    { key: 'png', title: 'png' },
+                    { key: 'webp', title: 'webp' }
+                ],
+                placeholder: t('outputFormatPlaceholder')
+            },
+            validator: { required: false }
+        },
+        {
             key: 'model',
             label: t('modelLabel'),
             component: FormItemComponent.Textarea,
@@ -248,7 +269,7 @@ fieldDecoratorKit.setDecorator({
             // 文件名处理逻辑
             const urlParts = imageUrl.split('/');
             const lastPart = urlParts[urlParts.length - 1];
-            let fileName = (lastPart && lastPart.includes('.')) ? lastPart.split('?')[0] : `image-${Date.now()}.png`;
+            let fileName = (lastPart && lastPart.includes('.')) ? lastPart.split('?')[0] : `image-${Date.now()}.${requestBody.output_format}`;
             debugLog('===007 开始检查图片大小 ===', result, logID);
             
 
@@ -300,7 +321,7 @@ function debugLog(stepOrData: string | object, data?: any, logID?: string) {
 }
 
 function buildRequestBody(params: any, logID?: string) {
-    const { model, original_image, prompt, resolution, proportion } = params;
+    const { model, original_image, prompt, resolution, proportion, output_format } = params;
 
     const getSelectValue = (fieldValue: any) => {
         if (!fieldValue) return null;
@@ -323,8 +344,10 @@ function buildRequestBody(params: any, logID?: string) {
         });
     }
 
+    const outputFormat = getSelectValue(output_format) || 'png';
     const requestBody: any = {
-        prompt: (typeof prompt === 'string' ? prompt.trim() : '')
+        prompt: (typeof prompt === 'string' ? prompt.trim() : ''),
+        output_format: ['jpeg', 'png', 'webp'].includes(outputFormat) ? outputFormat : 'png'
     };
 
     if (processedAttachments.length > 0) requestBody.original_image = processedAttachments;
